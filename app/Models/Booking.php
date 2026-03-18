@@ -13,7 +13,7 @@ class Booking extends Model
         'user_id',
         'event_id',
         'seats_booked',
-        'status',
+        'booking_status',
         'booking_date',
     ];
 
@@ -22,14 +22,13 @@ class Booking extends Model
         'booking_date' => 'datetime',
     ];
 
-    // Constants
-    const STATUS_BOOKED = 'booked';
+    // ─── Constants ───────────────────────────────────────────────────────────────
 
+    const STATUS_BOOKED    = 'booked';
     const STATUS_CANCELLED = 'cancelled';
 
-    /**
-     * Relationships
-    */
+    // ─── Relationships ───────────────────────────────────────────────────────────
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -40,16 +39,15 @@ class Booking extends Model
         return $this->belongsTo(Event::class);
     }
 
-    /**
-     * Helpers
-    */
+    // ─── Helpers ─────────────────────────────────────────────────────────────────
+
     public function isBooked(): bool
     {
-        return $this->status === self::STATUS_BOOKED;
+        return $this->booking_status === self::STATUS_BOOKED;
     }
 
     public function isCancelled(): bool
     {
-        return $this->status === self::STATUS_CANCELLED;
+        return $this->booking_status === self::STATUS_CANCELLED;
     }
 }

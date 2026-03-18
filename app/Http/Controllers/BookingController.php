@@ -19,20 +19,23 @@ class BookingController extends Controller
      * List the authenticated user's bookings.
      *
      * Query params:
-     *   - status   : booked | cancelled
-     *   - per_page : integer (default 15)
+     *   - booking_status : booked | cancelled
+     *   - per_page       : integer (default 15)
      */
     public function index(Request $request): AnonymousResourceCollection
     {
         $request->validate([
-            'status'   => ['nullable', 'string', 'in:booked,cancelled'],
-            'per_page' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'booking_status' => ['nullable', 'string', 'in:booked,cancelled'],
+            'per_page'       => ['nullable', 'integer', 'min:1', 'max:100'],
         ]);
 
         $bookings = $request->user()
             ->bookings()
             ->with('event.creator:id,name')
-            ->when($request->status, fn ($q) => $q->where('status', $request->status))
+            ->when(
+                $request->booking_status,
+                fn ($q) => $q->where('booking_status', $request->booking_status)
+            )
             ->orderByDesc('booking_date')
             ->paginate($request->integer('per_page', 15));
 
@@ -71,11 +74,11 @@ class BookingController extends Controller
             $event->decrement('available_seats', $request->seats_booked);
 
             return Booking::create([
-                'user_id'      => $request->user()->id,
-                'event_id'     => $event->id,
-                'seats_booked' => $request->seats_booked,
-                'status'       => Booking::STATUS_BOOKED,
-                'booking_date' => now(),
+                'user_id'        => $request->user()->id,
+                'event_id'       => $event->id,
+                'seats_booked'   => $request->seats_booked,
+                'booking_status' => Booking::STATUS_BOOKED,
+                'booking_date'   => now(),
             ]);
         });
 
@@ -95,7 +98,6 @@ class BookingController extends Controller
      */
     public function show(Request $request, Booking $booking): JsonResponse
     {
-        // EnsureBookingOwner middleware already verified ownership
         $booking->load('event.creator:id,name', 'user');
 
         return response()->json([
@@ -108,8 +110,6 @@ class BookingController extends Controller
      */
     public function cancel(Request $request, Booking $booking): JsonResponse
     {
-        // EnsureBookingOwner middleware already verified ownership
-
         if ($booking->isCancelled()) {
             return response()->json([
                 'message' => 'This booking has already been cancelled.',
@@ -119,7 +119,7 @@ class BookingController extends Controller
         DB::transaction(function () use ($booking) {
             $seatsToRestore = $booking->seats_booked;
 
-            $booking->update(['status' => Booking::STATUS_CANCELLED]);
+            $booking->update(['booking_status' => Booking::STATUS_CANCELLED]);
 
             // Restore available seats back to the event
             $booking->event()->lockForUpdate()->first()

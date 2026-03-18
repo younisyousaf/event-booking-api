@@ -10,12 +10,12 @@ class BookingResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'           => $this->id,
-            'seats_booked' => $this->seats_booked,
-            'status'       => $this->status,
-            'booking_date' => $this->booking_date->toIso8601String(),
-            'event'        => new EventResource($this->whenLoaded('event')),
-            'user'         => [
+            'id'             => $this->id,
+            'seats_booked'   => $this->seats_booked,
+            'booking_status' => $this->booking_status,
+            'booking_date'   => $this->booking_date->toIso8601String(),
+            'event'          => new EventResource($this->whenLoaded('event')),
+            'user'           => [
                 'id'    => $this->user->id,
                 'name'  => $this->user->name,
                 'email' => $this->user->email,
