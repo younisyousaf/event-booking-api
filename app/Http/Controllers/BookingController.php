@@ -118,7 +118,7 @@ class BookingController extends Controller
             $booking->update(['booking_status' => Booking::STATUS_CANCELLED]);
 
             // Restore available seats back to the event
-            $booking->event()->lockForUpdate()->first()
+            $booking->event()->lockForUpdate()->firstOrFail()
                 ->increment('available_seats', $seatsToRestore);
         });
 

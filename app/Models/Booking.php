@@ -22,12 +22,8 @@ class Booking extends Model
         'booking_date' => 'datetime',
     ];
 
-    // ─── Constants ───────────────────────────────────────────────────────────────
-
     const STATUS_BOOKED    = 'booked';
     const STATUS_CANCELLED = 'cancelled';
-
-    // ─── Relationships ───────────────────────────────────────────────────────────
 
     public function user()
     {
@@ -38,8 +34,6 @@ class Booking extends Model
     {
         return $this->belongsTo(Event::class);
     }
-
-    // ─── Helpers ─────────────────────────────────────────────────────────────────
 
     public function isBooked(): bool
     {

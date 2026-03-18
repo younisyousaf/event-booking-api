@@ -20,12 +20,12 @@ return new class extends Migration
                   ->constrained('events')
                   ->cascadeOnDelete();
             $table->unsignedInteger('seats_booked');
-            $table->enum('status', ['booked', 'cancelled'])->default('booked');
+            $table->enum('booking_status', ['booked', 'cancelled'])->default('booked');
             $table->dateTime('booking_date');
             $table->timestamps();
 
-            $table->index(['user_id', 'event_id', 'status']);
-            $table->index('status');
+            $table->index(['user_id', 'event_id', 'booking_status']);
+            $table->index('booking_status');
         });
     }
 

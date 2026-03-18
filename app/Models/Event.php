@@ -26,8 +26,6 @@ class Event extends Model
         'available_seats' => 'integer',
     ];
 
-    // ─── Relationships ───────────────────────────────────────────────────────────
-
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
@@ -37,8 +35,6 @@ class Event extends Model
     {
         return $this->hasMany(Booking::class);
     }
-
-    // ─── Scopes ──────────────────────────────────────────────────────────────────
 
     public function scopeByDate(Builder $query, ?string $date): Builder
     {

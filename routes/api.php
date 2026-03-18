@@ -17,19 +17,17 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// ── Public Auth routes ────────────────────────────────────────────────────────
+// Public routes ────────────────────────────────────────────────────────
 Route::prefix('auth')->name('auth.')->group(function () {
     Route::post('/register', [AuthController::class, 'register'])->name('register');
     Route::post('/login',    [AuthController::class, 'login'])->name('login');
 });
-
-// ── Public Event routes (read-only, no auth required) ────────────────────────
 Route::prefix('events')->name('events.')->group(function () {
     Route::get('/',        [EventController::class, 'index'])->name('index');
     Route::get('/{event}', [EventController::class, 'show'])->name('show');
 });
 
-// ── Authenticated routes ──────────────────────────────────────────────────────
+//Authenticated routes ──────────────────────────────────────────────────────
 Route::middleware('auth:sanctum')->group(function () {
 
     // Auth
@@ -38,7 +36,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me',      [AuthController::class, 'me'])->name('me');
     });
 
-    // Events — write operations (create / update / delete)
+    // Events Routes
     Route::prefix('events')->name('events.')->group(function () {
         Route::post('/',          [EventController::class, 'store'])->name('store');
         Route::put('/{event}',    [EventController::class, 'update'])->name('update');
@@ -46,12 +44,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/{event}', [EventController::class, 'destroy'])->name('destroy');
     });
 
-    // Bookings — all operations require authentication
+    // Bookings Routes
     Route::prefix('bookings')->name('bookings.')->group(function () {
         Route::get('/',  [BookingController::class, 'index'])->name('index');
         Route::post('/', [BookingController::class, 'store'])->name('store');
 
-        // These also require booking ownership
+        // Booking Ownership
         Route::middleware(EnsureBookingOwner::class)->group(function () {
             Route::get('/{booking}',          [BookingController::class, 'show'])->name('show');
             Route::patch('/{booking}/cancel', [BookingController::class, 'cancel'])->name('cancel');
