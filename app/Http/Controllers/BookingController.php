@@ -6,7 +6,6 @@ use App\Http\Requests\Booking\StoreBookingRequest;
 use App\Http\Resources\BookingResource;
 use App\Models\Booking;
 use App\Models\Event;
-use App\Notifications\BookingConfirmed;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -83,9 +82,6 @@ class BookingController extends Controller
         });
 
         $booking->load('event.creator:id,name', 'user');
-
-        // Send confirmation email — queued so it won't block the response
-        $request->user()->notify(new BookingConfirmed($booking));
 
         return response()->json([
             'message' => 'Booking confirmed successfully.',
