@@ -1,66 +1,280 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Event Booking API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+A RESTful API built with Laravel 10 for managing events and seat bookings. Users can browse events, make bookings, and cancel them. The system handles seat availability automatically and prevents race conditions using database-level locking.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Table of Contents
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Environment Setup](#environment-setup)
+- [Database Setup](#database-setup)
+- [Running the App](#running-the-app)
+- [Test Credentials](#test-credentials)
+- [Application Flow](#application-flow)
+- [API Reference](#api-reference)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Requirements
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP >= 8.1
+- Composer
+- MySQL or MariaDB
+- XAMPP (or any local server stack)
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+---
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Installation
 
-## Laravel Sponsors
+```bash
+# Clone the repository
+git clone https://github.com/your-username/event-booking-api.git
+cd event-booking-api
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+# Install dependencies
+composer install
+```
 
-### Premium Partners
+---
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+## Environment Setup
 
-## Contributing
+```bash
+# Copy the example env file
+cp .env.example .env
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Generate application key
+php artisan key:generate
+```
 
-## Code of Conduct
+Open `.env` and update the database credentials:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=event_booking
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-## Security Vulnerabilities
+> If you are using XAMPP with default settings, `DB_USERNAME=root` and `DB_PASSWORD=` (empty) is correct.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Create the database manually in phpMyAdmin or via MySQL CLI:
 
-## License
+```sql
+CREATE DATABASE event_booking;
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## Database Setup
+
+Run all migrations to create the required tables:
+
+```bash
+php artisan migrate
+```
+
+This creates the following tables:
+
+| Table                      | Purpose                               |
+| -------------------------- | ------------------------------------- |
+| `users`                    | Registered user accounts              |
+| `personal_access_tokens`   | Sanctum API tokens                    |
+| `events`                   | Event listings with seat tracking     |
+| `bookings`                 | Booking records with status management|
+
+### Seed Sample Data
+
+```bash
+php artisan db:seed
+```
+
+This creates:
+
+- 2 test users (admin + regular user)
+- 8 additional randomly generated users
+- 22 sample events (15 upcoming, 5 past, 2 sold-out)
+
+To reset and reseed from scratch:
+
+```bash
+php artisan migrate:fresh --seed
+```
+
+---
+
+## Running the App
+
+```bash
+php artisan serve
+```
+
+API is available at `http://localhost:8000/api`
+
+---
+
+## Test Credentials
+
+These accounts are created automatically by the seeder:
+
+| Role  | Email                   | Password |
+| ----- | ----------------------- | -------- |
+| Admin | `admin@example.com`     | password |
+| User  | `user@example.com`      | password |
+
+Use either account to log in and receive a Bearer token for authenticated requests.
+
+---
+
+## Application Flow
+
+### 1. Authentication
+
+Register a new account via `POST /api/auth/register`, then login via `POST /api/auth/login`. The login response includes a `token`. Pass it in every authenticated request as:
+
+```text
+Authorization: Bearer {token}
+```
+
+Logout via `POST /api/auth/logout` to invalidate the token.
+
+### 2. Browsing Events
+
+Anyone can list and view events without logging in. Events can be filtered by **date** and/or **location**, and results are paginated (default 15 per page):
+
+```text
+GET /api/events
+GET /api/events?date=2026-06-15
+GET /api/events?location=Paris
+GET /api/events?date=2026-06-15&location=Paris
+GET /api/events?per_page=5&page=2
+```
+
+### 3. Creating a Booking
+
+Browse events and pick one with available seats. Send a `POST /api/bookings` request with the event ID and how many seats you want. The system checks that the event has not passed and that enough seats are available. On success, `available_seats` on the event is decremented automatically inside a database transaction.
+
+### 4. How Seat Availability Works
+
+Each event stores `total_seats` and `available_seats`. When a booking is confirmed, `available_seats` is reduced by the seats booked. When a booking is cancelled, the seats are returned. Bookings use **pessimistic locking** (`lockForUpdate`) so two users cannot book the last seat at the same time. An event with `available_seats = 0` is returned with `"is_sold_out": true`.
+
+### 5. Cancelling a Booking
+
+Send `PATCH /api/bookings/{id}/cancel`. Only the user who created the booking can cancel it — the `EnsureBookingOwner` middleware enforces this. Already cancelled bookings cannot be cancelled again, and seats are restored to the event immediately.
+
+---
+
+## API Reference
+
+### Required Headers
+
+```text
+Accept: application/json
+Content-Type: application/json
+```
+
+For authenticated routes, also include:
+
+```text
+Authorization: Bearer {token}
+```
+
+---
+
+### Auth Endpoints
+
+| Method | Endpoint              | Auth Required | Description                          |
+| ------ | --------------------- | ------------- | ------------------------------------ |
+| POST   | `/api/auth/register`  | No            | Register a new user                  |
+| POST   | `/api/auth/login`     | No            | Login and receive a token            |
+| GET    | `/api/auth/me`        | Yes           | Get the authenticated user's profile |
+| POST   | `/api/auth/logout`    | Yes           | Logout and revoke the token          |
+
+**Register body:**
+
+```json
+{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "password123",
+    "password_confirmation": "password123"
+}
+```
+
+**Login body:**
+
+```json
+{
+    "email": "john@example.com",
+    "password": "password123"
+}
+```
+
+---
+
+### Event Endpoints
+
+| Method    | Endpoint             | Auth Required | Description                    |
+| --------- | -------------------- | ------------- | ------------------------------ |
+| GET       | `/api/events`        | No            | List upcoming events (paginated)|
+| GET       | `/api/events/{id}`   | No            | Get a single event             |
+| POST      | `/api/events`        | Yes           | Create a new event             |
+| PUT/PATCH | `/api/events/{id}`   | Yes           | Update an event                |
+| DELETE    | `/api/events/{id}`   | Yes           | Delete an event                |
+
+**Create/Update event body:**
+
+```json
+{
+    "title": "Laravel Conference 2026",
+    "description": "Annual Laravel developer conference.",
+    "location": "Paris, France",
+    "event_datetime": "2026-09-15 09:00:00",
+    "total_seats": 200
+}
+```
+
+**Available query parameters for listing:**
+
+| Param      | Type    | Example        | Description                                      |
+| ---------- | ------- | -------------- | ------------------------------------------------ |
+| `date`     | string  | `2026-06-15`   | Filter by exact date                             |
+| `location` | string  | `Paris`        | Filter by location (partial match, case-insensitive) |
+| `per_page` | integer | `10`           | Results per page (1–100, default 15)             |
+| `page`     | integer | `2`            | Page number                                      |
+
+---
+
+### Booking Endpoints
+
+| Method | Endpoint                      | Auth Required | Description                  |
+| ------ | ----------------------------- | ------------- | ---------------------------- |
+| GET    | `/api/bookings`               | Yes           | List your bookings (paginated)|
+| POST   | `/api/bookings`               | Yes           | Create a booking             |
+| GET    | `/api/bookings/{id}`          | Yes           | Get a single booking         |
+| PATCH  | `/api/bookings/{id}/cancel`   | Yes           | Cancel a booking             |
+
+**Create booking body:**
+
+```json
+{
+    "event_id": 1,
+    "seats_booked": 2
+}
+```
+
+---
+
+## Tech Stack
+
+| Layer           | Technology                    |
+| --------------- | ----------------------------- |
+| Framework       | Laravel 10                    |
+| Authentication  | Laravel Sanctum (token-based) |
+| Database        | MySQL / MariaDB               |
+| Validation      | Laravel Form Request classes  |
+| API Responses   | Laravel API Resources         |
