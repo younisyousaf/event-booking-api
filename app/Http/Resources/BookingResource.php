@@ -15,11 +15,11 @@ class BookingResource extends JsonResource
             'booking_status' => $this->booking_status,
             'booking_date'   => $this->booking_date->toIso8601String(),
             'event'          => new EventResource($this->whenLoaded('event')),
-            'user'           => [
+            'user'           => $this->whenLoaded('user', fn () => [
                 'id'    => $this->user->id,
                 'name'  => $this->user->name,
                 'email' => $this->user->email,
-            ],
+            ]),
             'created_at' => $this->created_at->toIso8601String(),
         ];
     }

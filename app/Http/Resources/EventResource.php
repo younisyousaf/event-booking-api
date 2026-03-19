@@ -18,10 +18,10 @@ class EventResource extends JsonResource
             'total_seats'     => $this->total_seats,
             'available_seats' => $this->available_seats,
             'is_sold_out'     => $this->available_seats === 0,
-            'created_by'      => [
+            'created_by' => $this->creator ? [
                 'id'   => $this->creator->id,
                 'name' => $this->creator->name,
-            ],
+            ] : null,
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->updated_at->toIso8601String(),
         ];

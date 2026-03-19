@@ -30,7 +30,7 @@ class BookingController extends Controller
 
         $bookings = $request->user()
             ->bookings()
-            ->with('event.creator:id,name')
+            ->with('event.creator:id,name', 'user')
             ->when(
                 $request->booking_status,
                 fn ($q) => $q->where('booking_status', $request->booking_status)
