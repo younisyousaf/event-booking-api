@@ -30,7 +30,7 @@ A RESTful API built with Laravel 10 for managing events and seat bookings. Users
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/event-booking-api.git
+git clone https://github.com/younisyousaf/event-booking-api.git
 cd event-booking-api
 
 # Install dependencies
